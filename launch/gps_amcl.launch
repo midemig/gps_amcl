@@ -114,54 +114,6 @@
       <remap from="odom" to="gps_odometry"/>
   	</node>
 
-	<!--  LOAM -->
-	<arg name="output" default="log"/>
-	<arg name="rviz" default="false"/>
-  	<arg name="scanPeriod" default="0.1"/>
-
-	<!--node pkg="loam_velodyne" type="multiScanRegistration" name="multiScanRegistration" clear_params="true" output="$(arg output)">
-		<param name="lidar" value="VLP-16"/>
-		<param name="scanPeriod" value="$(arg scanPeriod)"/>
-		<remap from="/multi_scan_points" to="/kitti/velo/pointcloud"/>
-		<remap from="/imu/data" to="imu/data"/>
-		<remap from="/velodyne_cloud_2" to="velodyne_cloud_2"/>
-		<remap from="/laser_cloud_sharp" to="laser_cloud_sharp"/>
-		<remap from="/laser_cloud_less_sharp" to="laser_cloud_less_sharp"/>
-		<remap from="/laser_cloud_flat" to="laser_cloud_flat"/>
-		<remap from="/laser_cloud_less_flat" to="laser_cloud_less_flat"/>
-		<remap from="/imu_trans" to="imu_trans"/>
-	</node>
-
-	<node pkg="loam_velodyne" type="laserOdometry" name="laserOdometry" respawn="true" clear_params="true" output="$(arg output)">
-		<param name="scanPeriod" value="$(arg scanPeriod)"/>
-		<remap from="/laser_cloud_sharp" to="laser_cloud_sharp"/>
-		<remap from="/laser_cloud_less_sharp" to="laser_cloud_less_sharp"/>
-		<remap from="/laser_cloud_flat" to="laser_cloud_flat"/>
-		<remap from="/laser_cloud_less_flat" to="laser_cloud_less_flat"/>
-		<remap from="/velodyne_cloud_2" to="velodyne_cloud_2"/>
-		<remap from="/imu_trans" to="imu_trans"/>
-		<remap from="/laser_cloud_corner_last" to="laser_cloud_corner_last"/>
-		<remap from="/laser_cloud_surf_last" to="laser_cloud_surf_last"/>
-		<remap from="/velodyne_cloud_3" to="velodyne_cloud_3"/>
-		<remap from="/laser_odom_to_init" to="laser_odom_to_init"/>
-	</node>
-
-	<node pkg="loam_velodyne" type="laserMapping" name="laserMapping" clear_params="true" output="$(arg output)">
-		<param name="scanPeriod" value="$(arg scanPeriod)"/>
-		<remap from="/laser_cloud_corner_last" to="laser_cloud_corner_last"/>
-		<remap from="/laser_cloud_surf_last" to="laser_cloud_surf_last"/>
-		<remap from="/laser_odom_to_init" to="laser_odom_to_init"/>
-		<remap from="/velodyne_cloud_3" to="velodyne_cloud_3"/>
-		<remap from="/imu/data" to="imu/data"/>
-		<remap from="/laser_cloud_surround" to="laser_cloud_surround"/>
-		<remap from="/velodyne_cloud_registered" to="velodyne_cloud_registered"/>
-		<remap from="/aft_mapped_to_init" to="aft_mapped_to_init"/>
-	</node>
-
-	<node pkg="loam_velodyne" type="transformMaintenance" name="transformMaintenance" clear_params="true" output="$(arg output)">
-		<remap from="/laser_odom_to_init" to="laser_odom_to_init"/>
-		<remap from="/aft_mapped_to_init" to="aft_mapped_to_init"/>
-		<remap from="/integrated_to_init" to="integrated_to_init"/>
-	</node-->
+  	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find gps_amcl)/cfg/gps_amcl.rviz" />
 	
 </launch>

@@ -21,7 +21,6 @@
 
     <build_depend>message_filters</build_depend>
     <build_depend>tf2_geometry_msgs</build_depend>
-    <!-- <build_depend>eigen</build_depend> -->
 
     <depend>diagnostic_updater</depend>
     <depend>dynamic_reconfigure</depend>
@@ -34,7 +33,10 @@
     <depend>tf2</depend>
     <depend>tf2_msgs</depend>
     <depend>tf2_ros</depend>
-    <!-- <depend>Eigen3</depend> -->
+    <depend>robot_localization</depend>
+    <depend>pointcloud_to_laserscan</depend>
+    <depend>map_server</depend>
+    <depend>gps_common</depend>
 
     <test_depend>map_server</test_depend>
     <test_depend>rostest</test_depend>
