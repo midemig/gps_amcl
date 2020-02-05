@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<launch>
+	
+	<param name="/use_sim_time" value="true"/>
+
+	<!--  ****** UKF *****  -->
+
+	<!--include file="$(find gps_amcl)/launch/ukf.launch"/-->
+
+	<!--  ****** GPS AMCL *****  -->
+	<node pkg="gps_amcl" type="gps_amcl" name="gps_amcl" output="screen">
+		<rosparam file="$(find gps_amcl)/cfg/gps_amcl_params.yaml" command="load" />
+		<param name="odom_frame_id" value="odom"/>
+		<param name="base_frame_id" value="velo_link"/>
+		<param name="initial_pose_x"            value="0.0"/>
+		<param name="initial_pose_y"            value="0.0"/>
+		<param name="initial_pose_a"            value="-0.657"/>
+		<param name="initial_cov_xx"            value="0.001"/>
+		<param name="initial_cov_yy"            value="0.001"/>
+		<param name="initial_cov_aa"            value="0.001"/>
+		<param name="gps_topic"            value="/pixhawk_gps_t"/>
+	</node>
+
+
+	<!--  ****** PCL TO LASERSCAN *****  -->
+	<node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" output="screen">
+		<param name="range_min" value="0.3" />
+		<param name="range_max" value="25" />
+		<param name="min_height" value="0.0" />
+		<param name="max_height" value="2.0" />
+		<param name="angle_min" value="-3.1416" />
+		<param name="angle_max" value="3.1416" />
+	    <remap from="/cloud_in" to="/kitti/velo/pointcloud" />
+		<param name="target_frame" value="velo_link" />
+	</node>
+
+	<node pkg="tf" type="static_transform_publisher" name="tf_pub_1" args="-0.595 0.02 1.73 0 0 0 1 base_link velo_link 100"/>
+	<node pkg="tf" type="static_transform_publisher" name="tf_pub_2" args="-1.405 0.32 1.73 0 0 0 1 base_link imu_link 100"/>
+
+	<!-- Static map for GPS AMCL  -->
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find gps_amcl)/maps/kitti_36.yaml" output="log">
+		<param name="frame_id" value="map"/>
+	</node>
+
+	<!-- Odometry source -->
+	<node pkg="gps_amcl" type="odometry_transform.py" name="odometry_source" output="log">
+	  <param name="send_tf" value="True"/>
+	  <param name="heading_from_poses" value="False"/>
+	  <param name="reset_odometry" value="False"/>
+	  <!--param name="loam_active" value="True"/-->
+	  <param name="loam_active" value="False"/>
+	  <param name="input_type" value="0"/>
+	  <!--param name="input_topic" value="/laser_odom_to_init"/-->
+	  <param name="input_topic" value="/odometry_gt"/>
+	  <param name="output_topic" value="/lidar_odometry"/>
+	  <param name="tf_parent" value="odom"/>
+	  <param name="tf_child" value="base_link"/>
+	</node>
+
+	<!-- AMCL GPS Corrections -->
+	<node pkg="gps_amcl" type="odometry_transform.py" name="gps_corrections" output="screen">
+	  <param name="send_tf" value="False"/>
+	  <param name="heading_from_poses" value="False"/>
+	  <param name="add_noise_cov" value="0.3"/>
+	  <param name="reset_odometry" value="False"/>
+	  <!--param name="first_x" value="621334.2248625141"/>
+	  <param name="first_y" value="3209319.0555673223"/>
+	  <param name="first_z" value="379.63"/-->
+	  <param name="loam_active" value="False"/>
+	  <param name="input_type" value="0"/>
+	  <param name="input_topic" value="/odometry_gt"/>
+	  <param name="output_topic" value="/pixhawk_gps_t"/>
+	  <param name="tf_parent" value="map"/>
+	  <param name="tf_child" value="map"/>
+	</node>
+
+	<!-- AMCL GPS Output -->
+	<node pkg="gps_amcl" type="odometry_transform.py" name="amcl_output" output="log">
+	  <param name="send_tf" value="False"/>
+	  <param name="heading_from_poses" value="False"/>
+	  <param name="reset_odometry" value="False"/>
+	  <param name="loam_active" value="False"/>
+	  <param name="input_type" value="1"/>
+	  <param name="input_topic" value="/amcl_pose"/>
+	  <param name="output_topic" value="/amcl_pose_t"/>
+	  <param name="tf_parent" value="map"/>
+	  <param name="tf_child" value="base_link"/>
+	</node>
+
+	<!-- Groundtruth -->
+	<node pkg="gps_amcl" type="odometry_transform.py" name="odometry_groundtruth" output="screen">
+	  <param name="send_tf" value="False"/>
+	  <param name="heading_from_poses" value="True"/>
+	  <param name="reset_odometry" value="True"/>
+	  <param name="first_x" value="452915.17"/> <!-- 42->462655.29   34->461206.41   36->452915.17 -->
+	  <param name="first_y" value="5430537.84"/>  <!-- 42->5428328.33   34->5426213.64    36->5430537.84 -->
+	  <param name="first_z" value="121.16960907"/>
+	  <param name="loam_active" value="False"/>
+	  <param name="translation_to_frame" value="False"/>
+	  <param name="input_type" value="0"/>
+	  <param name="input_topic" value="gps_odometry"/>
+	  <param name="output_topic" value="odometry_gt"/>
+	  <param name="tf_parent" value="map"/>
+	  <param name="tf_child" value="velo_link"/>
+	</node>
+
+
+	<node pkg="gps_common" type="utm_odometry_node" name="utm_odometry_node">
+      <param name="rot_covariance" value="0.001" />
+      <param name="frame_id" value="map" />
+      <param name="child_frame_id" value="base_link" />
+
+      <remap from="fix" to="/kitti/oxts/gps/fix"/>
+      <remap from="odom" to="gps_odometry"/>
+  	</node>
+
+	<!--  LOAM -->
+	<arg name="output" default="log"/>
+	<arg name="rviz" default="false"/>
+  	<arg name="scanPeriod" default="0.1"/>
+
+	<!--node pkg="loam_velodyne" type="multiScanRegistration" name="multiScanRegistration" clear_params="true" output="$(arg output)">
+		<param name="lidar" value="VLP-16"/>
+		<param name="scanPeriod" value="$(arg scanPeriod)"/>
+		<remap from="/multi_scan_points" to="/kitti/velo/pointcloud"/>
+		<remap from="/imu/data" to="imu/data"/>
+		<remap from="/velodyne_cloud_2" to="velodyne_cloud_2"/>
+		<remap from="/laser_cloud_sharp" to="laser_cloud_sharp"/>
+		<remap from="/laser_cloud_less_sharp" to="laser_cloud_less_sharp"/>
+		<remap from="/laser_cloud_flat" to="laser_cloud_flat"/>
+		<remap from="/laser_cloud_less_flat" to="laser_cloud_less_flat"/>
+		<remap from="/imu_trans" to="imu_trans"/>
+	</node>
+
+	<node pkg="loam_velodyne" type="laserOdometry" name="laserOdometry" respawn="true" clear_params="true" output="$(arg output)">
+		<param name="scanPeriod" value="$(arg scanPeriod)"/>
+		<remap from="/laser_cloud_sharp" to="laser_cloud_sharp"/>
+		<remap from="/laser_cloud_less_sharp" to="laser_cloud_less_sharp"/>
+		<remap from="/laser_cloud_flat" to="laser_cloud_flat"/>
+		<remap from="/laser_cloud_less_flat" to="laser_cloud_less_flat"/>
+		<remap from="/velodyne_cloud_2" to="velodyne_cloud_2"/>
+		<remap from="/imu_trans" to="imu_trans"/>
+		<remap from="/laser_cloud_corner_last" to="laser_cloud_corner_last"/>
+		<remap from="/laser_cloud_surf_last" to="laser_cloud_surf_last"/>
+		<remap from="/velodyne_cloud_3" to="velodyne_cloud_3"/>
+		<remap from="/laser_odom_to_init" to="laser_odom_to_init"/>
+	</node>
+
+	<node pkg="loam_velodyne" type="laserMapping" name="laserMapping" clear_params="true" output="$(arg output)">
+		<param name="scanPeriod" value="$(arg scanPeriod)"/>
+		<remap from="/laser_cloud_corner_last" to="laser_cloud_corner_last"/>
+		<remap from="/laser_cloud_surf_last" to="laser_cloud_surf_last"/>
+		<remap from="/laser_odom_to_init" to="laser_odom_to_init"/>
+		<remap from="/velodyne_cloud_3" to="velodyne_cloud_3"/>
+		<remap from="/imu/data" to="imu/data"/>
+		<remap from="/laser_cloud_surround" to="laser_cloud_surround"/>
+		<remap from="/velodyne_cloud_registered" to="velodyne_cloud_registered"/>
+		<remap from="/aft_mapped_to_init" to="aft_mapped_to_init"/>
+	</node>
+
+	<node pkg="loam_velodyne" type="transformMaintenance" name="transformMaintenance" clear_params="true" output="$(arg output)">
+		<remap from="/laser_odom_to_init" to="laser_odom_to_init"/>
+		<remap from="/aft_mapped_to_init" to="aft_mapped_to_init"/>
+		<remap from="/integrated_to_init" to="integrated_to_init"/>
+	</node-->
+	
+</launch>
