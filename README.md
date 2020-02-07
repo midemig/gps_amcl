@@ -16,6 +16,15 @@ The algorithm is tested using KITTI odometry dataset proving that it improves lo
 
 ### Videos
 
+ * *GPS AMCL*
+
+![alt-text](demo_videos/gps_amcl.gif)
+
+
+ * *ORIGINAL AMCL*
+
+![alt-text](demo_videos/amcl.gif)
+
 
 
 
