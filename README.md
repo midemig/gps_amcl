@@ -5,7 +5,7 @@ The gps_amcl ROS package implements a modified version of original amcl node fro
 The algorithm is tested using KITTI odometry dataset proving that it improves localization compared with classic GNSS+INS fusion and AMCL.
 
 
-### Example of ussage 
+### Example of usage 
 
 
 	Real-driving data can be obtained from http://www.cvlibs.net/datasets/kitti/raw_data.php?type=residential and converted into bagfile using kitti2bag from https://github.com/tomas789/kitti2bag (/tf and static_tf topics must be filtered)
