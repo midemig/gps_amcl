@@ -37,6 +37,7 @@
     <depend>pointcloud_to_laserscan</depend>
     <depend>map_server</depend>
     <depend>gps_common</depend>
+    <depend>navigation</depend>
 
     <test_depend>map_server</test_depend>
     <test_depend>rostest</test_depend>
