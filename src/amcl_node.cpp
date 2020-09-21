@@ -226,6 +226,7 @@ class AmclNode
     int resample_count_;
     double laser_min_range_;
     double laser_max_range_;
+    double k_l_;
 
     //Nomotion update control
     bool m_force_update;  // used to temporarily let amcl update samples even when no motion occurs...
@@ -451,6 +452,7 @@ AmclNode::AmclNode() :
 
   ///For GPS
   private_nh_.param("gps_topic", gps_topic_, std::string("/gps_odometry"));
+  private_nh_.param("k_l", k_l_, 200.0);
 
   transform_tolerance_.fromSec(tmp_tol);
 
@@ -607,6 +609,7 @@ void AmclNode::reconfigureCB(AMCLConfig &config, uint32_t level)
   pf_z_ = config.kld_z; 
   pf_->pop_err = pf_err_;
   pf_->pop_z = pf_z_;
+  pf_->k_l = k_l_;
 
   // Initialize the filter
   pf_vector_t pf_init_pose_mean = pf_vector_zero();
@@ -913,6 +916,7 @@ AmclNode::handleMapMessage(const nav_msgs::OccupancyGrid& msg)
   pf_init_pose_cov.m[2][2] = init_cov_[2];
   pf_init(pf_, pf_init_pose_mean, pf_init_pose_cov);
   pf_init_ = false;
+  pf_->k_l = k_l_;
 
   // Instantiate the sensor objects
   // Odometry

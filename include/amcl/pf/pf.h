@@ -137,6 +137,7 @@ typedef struct _pf_t
   double gps_x, gps_y, gps_yaw;
   double cov_matrix[9];
   double eigen_matrix[9];
+  double k_l;
 } pf_t;
 
 

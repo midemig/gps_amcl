@@ -429,7 +429,8 @@ void pf_update_resample(pf_t *pf)
     mult_1_3_x_3_3(mat, inverse, result);
     double temp = mult_1_3_x_3_1(result, mat);
     double d = 1/(pow(3.14159 * 2, 1.5) * sqrt(get_determinant(pf->cov_matrix))) * exp(-0.5 * temp);
-    set_a->samples[i].weight = set_a->samples[i].weight * 2000 + d;
+    set_a->samples[i].weight = set_a->samples[i].weight * pf->k_l + d;
+
 
     total_weight += set_a->samples[i].weight;
   }
