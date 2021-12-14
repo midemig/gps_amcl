@@ -419,7 +419,7 @@ void pf_update_resample(pf_t *pf)
     double distance = (pow(set_a->samples[i].pose.v[0]-pf->gps_x, 2)/pf->cov_matrix[0] + pow(set_a->samples[i].pose.v[1]-pf->gps_y, 2)/pf->cov_matrix[4] + pow(set_a->samples[i].pose.v[2]-pf->gps_yaw, 2)/pf->cov_matrix[8]);
 
     double cov = (pf->cov_matrix[0] * pf->cov_matrix[4] * pf->cov_matrix[8]);
-    total_dist_prob += 1/(2*3.14159 * cov)*exp(-1*distance/2);
+    total_dist_prob += 1/sqrt(pow(2*3.14159, 3) * cov)*exp(-1*distance/2);
 
     //Multivariable gausian
     double mat[3] = {set_a->samples[i].pose.v[0]-pf->gps_x, set_a->samples[i].pose.v[1]-pf->gps_y, set_a->samples[i].pose.v[2]-pf->gps_yaw};
