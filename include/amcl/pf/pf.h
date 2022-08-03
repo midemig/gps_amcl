@@ -62,7 +62,7 @@ typedef struct
   pf_vector_t pose;
 
   // Weight for this pose
-  double weight, score;
+  double weight;
   
 } pf_sample_t;
 

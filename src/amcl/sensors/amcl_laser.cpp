@@ -302,7 +302,6 @@ double AMCLLaser::LikelihoodFieldModel(AMCLLaserData *data, pf_sample_set_t* set
       best_p_tot = p_tot;
 
     sample->weight *= p;
-    sample->score = p_tot/data->range_count;
     total_weight += sample->weight;
   }
 
