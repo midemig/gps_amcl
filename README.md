@@ -41,4 +41,8 @@ Install dependencies (listed in the *package.xml* and *CMakeLists.txt* file) usi
 
 *Please cite the following publications if you are using the planner for your own research:*
 
-- de Miguel, M.Á.; García, F.; Armingol, J.M. Improved LiDAR Probabilistic Localization for Autonomous Vehicles Using GNSS. Sensors 2020, 20, 3145. 
+- de Miguel, M.Á.; García, F.; Armingol, J.M. Improved LiDAR Probabilistic Localization for Autonomous Vehicles Using GNSS. Sensors 2020, 20, 3145.
+
+
+[![CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](http://creativecommons.org/licenses/by/4.0/)
+
